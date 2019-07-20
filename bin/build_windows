@@ -4,4 +4,4 @@
 # this could work seamlessly with any ci/cd platform as we wrap the build tools
 # and this file works just as any other bash script
 
-./../mvnw.cmd clean package
+./mvnw.cmd clean package
