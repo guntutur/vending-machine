@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+
+# this simple script is intended to run the vending machine application
+# this could work seamlessly with any automation platform with the assumption ./bin/build has already been executed
+# and this file works just as any other bash script
+
+# This variable contains absolute path of the `vending machine` script
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
+
+# execute command
+
+java -cp $DIR/../target/vending-machine-1.0-SNAPSHOT.jar com.shortlyst.test.vendingmachine.App $1

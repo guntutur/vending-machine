@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+
+# this simple script is intended to replace the real maven command to build from source
+# this could work seamlessly with any ci/cd platform as we wrap the build tools
+# and this file works just as any other bash script
+
+./../mvnw.cmd clean package
