@@ -23,10 +23,11 @@ import java.util.List;
 public class ShelveBoxController implements IInput {
 
     private ShelveBoxService shelveBoxService = new ShelveBoxService();
-    private int selectedShelf;
+//    private int selectedShelf;
     private int totalHoldAmount = 0;
     private int totalCurrentHoldAmount = 0;
     private List<Integer> insertedCoin = new ArrayList<>();
+    private List<Goods> selectedGoods = new ArrayList<>();
 
     public ShelveBoxController init() {
         shelveBoxService.addToShelf("Canned coffee", 120, 3);
@@ -57,45 +58,28 @@ public class ShelveBoxController implements IInput {
         return shelveBoxService.getAvailableGoods();
     }
 
-    public boolean selectGoodsAttempt(List<ShelveBox> currentlyHoldShelve, int index, int currentCoin) {
-        boolean proceed = true;
+//    public boolean selectGoodsAttempt(List<ShelveBox> currentlyHoldShelves, int index, int currentCoin) {
+//        boolean proceed = true;
+//        int totalHoldPrice = 0;
+//        for (ShelveBox box : currentlyHoldShelves) {
+//            totalHoldPrice += box.getGoods().getPrice();
+//        }
+//        totalHoldPrice += getGoodsFromIndex(index).getPrice();
+//        if (totalHoldPrice > currentCoin) {
+//            proceed = false;
+//        }
+//
+//        totalHoldAmount = totalHoldPrice;
+//
+//        return proceed;
+//    }
+
+    public int getTotalHoldAmount() {
         int totalHoldPrice = 0;
-        for (ShelveBox box : currentlyHoldShelve) {
-            totalHoldPrice += box.getGoods().getPrice();
+        for (Goods goods : selectedGoods) {
+            totalHoldPrice += goods.getPrice();
         }
-        totalHoldPrice += getGoodsFromIndex(index).getPrice();
-        if (totalHoldPrice > currentCoin) {
-            proceed = false;
-        }
-
-        totalHoldAmount = totalHoldPrice;
-
-        return proceed;
-    }
-
-    @Override
-    public void cancel() {
-
-    }
-
-    // todo subtract quantity
-    // sent selected to outlet
-    @Override
-    public void selectShelf(int index) {
-
-    }
-
-    @Override
-    public void insertCoin(Double coin) {
-
-    }
-
-    private int getTotalHoldAmount() {
-        return totalHoldAmount;
-    }
-
-    public void addCoin(Integer amount) {
-        insertedCoin.add(amount);
+        return sumInsertedCoin() - totalHoldPrice;
     }
 
     public int getTotalCurrentHoldAmount() {
@@ -104,5 +88,37 @@ public class ShelveBoxController implements IInput {
 
     private Integer sumInsertedCoin() {
         return insertedCoin.stream().mapToInt(a -> a).sum();
+    }
+
+    public boolean canProceed() {
+        return sumInsertedCoin() > getTotalCurrentHoldAmount();
+    }
+
+    public void removeFromContainer() {
+        selectedGoods.remove(selectedGoods.size()-1);
+    }
+
+    public List<Goods> getSelectedGoods() {
+        return selectedGoods;
+    }
+
+    @Override
+    public void cancel() {
+
+    }
+
+    @Override
+    public void selectShelf(int index) {
+        selectedGoods.add(shelveBoxService.releaseGoodsFromIndex(index));
+        selectedGoods.forEach(goods -> totalCurrentHoldAmount += goods.getPrice());
+    }
+
+    @Override
+    public void insertCoin(int coin) {
+        insertedCoin.add(coin);
+    }
+
+    public void test() {
+        System.out.println("anuan");
     }
 }

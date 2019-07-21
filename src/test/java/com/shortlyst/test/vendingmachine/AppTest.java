@@ -1,5 +1,6 @@
 package com.shortlyst.test.vendingmachine;
 
+import com.shortlyst.test.vendingmachine.controller.ShelveBoxController;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -9,12 +10,12 @@ import static org.junit.Assert.*;
 public class AppTest {
 
     private App app;
+    private static ShelveBoxController shelveBoxController;
 
     @Before
     public void setUp() throws Exception {
-
         app = new App();
-
+        shelveBoxController = new ShelveBoxController().init();
     }
 
     @After
@@ -23,11 +24,9 @@ public class AppTest {
 
     @Test
     public void main() {
-
-        app.processCommand("1 500");
-        app.processCommand("1 500");
-        app.processCommand("1 500");
-//        assertEquals(Long.valueOf(app.insertedCoin.stream().mapToInt(a -> a).sum()), Long.valueOf(1500));
-
+        shelveBoxController.insertCoin(500);
+        shelveBoxController.insertCoin(500);
+        shelveBoxController.insertCoin(500);
+        assertEquals(shelveBoxController.getTotalHoldAmount(), 1500);
     }
 }

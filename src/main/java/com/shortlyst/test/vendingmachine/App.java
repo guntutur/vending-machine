@@ -1,6 +1,7 @@
 package com.shortlyst.test.vendingmachine;
 
 import com.shortlyst.test.vendingmachine.controller.ShelveBoxController;
+import com.shortlyst.test.vendingmachine.domain.Goods;
 import com.shortlyst.test.vendingmachine.domain.ShelveBox;
 import com.shortlyst.test.vendingmachine.service.CoinCalculatorService;
 
@@ -13,11 +14,10 @@ import java.util.*;
  */
 public class App {
 
-    private ShelveBoxController shelveBoxController;
-    private CoinCalculatorService calculatorService;
-    private Hinter hinter;
+    private static ShelveBoxController shelveBoxController;
+    private static CoinCalculatorService calculatorService;
+    private static Hinter hinter;
 
-    private List<ShelveBox> selectedGoods = new ArrayList<>();
     private List<Integer> returnGate = new ArrayList<>();
 
     private static final Collection<Integer> DEFAULT_COIN_STOCK = Arrays.asList(
@@ -30,14 +30,13 @@ public class App {
     public static void main(String[] args) {
 
         App app = new App();
+        shelveBoxController = new ShelveBoxController().init();
+        calculatorService = new CoinCalculatorService(DEFAULT_COIN_STOCK);
+        hinter = new App().new Hinter();
         app.interactiveShell();
     }
 
     private void interactiveShell() {
-
-        hinter = new App().new Hinter();
-        shelveBoxController = new ShelveBoxController().init();
-        calculatorService = new CoinCalculatorService(DEFAULT_COIN_STOCK);
 
         System.out.println("Welcome to Vending Machine ver 1.0-SNAPSHOT");
         System.out.println("Type help to see available command");
@@ -76,7 +75,7 @@ public class App {
                 if (ACCEPTED_DENOMINATION_COIN.stream().noneMatch(s -> s.equals(amount))) {
                     hinter.setOutput(1, "Denomination is not acceptable, valid denomination are : " + String.join(", ", ACCEPTED_DENOMINATION_COIN.toString()));
                 } else {
-                    shelveBoxController.addCoin(amount);
+                    shelveBoxController.insertCoin(amount);
                 }
                 break;
             case "2":
@@ -84,17 +83,10 @@ public class App {
                 if (shelveBoxController.getShelveBoxFromIndex(selectedIndex).getQuantity() == 0) {
                     hinter.setOutput(1, "Cannot select item, out of stock");
                 } else {
-                    if (shelveBoxController.selectGoodsAttempt(
-                            selectedGoods,
-                            selectedIndex,
-                            shelveBoxController.getTotalCurrentHoldAmount()
-                    )) {
-                        ShelveBox selected = new ShelveBox(
-                                shelveBoxController.getGoodsFromIndex(selectedIndex),
-                                1
-                        );
-                        selectedGoods.add(selected);
-                    } else {
+
+                    shelveBoxController.selectShelf(selectedIndex);
+                    if (!shelveBoxController.canProceed()) {
+                        shelveBoxController.removeFromContainer();
                         hinter.setOutput(1, "Coin insufficient, try insert more");
                     }
                 }
@@ -102,7 +94,7 @@ public class App {
             case "3":
                 calculatorService = new CoinCalculatorService(
                         DEFAULT_COIN_STOCK,
-                        shelveBoxController.getTotalCurrentHoldAmount()
+                        shelveBoxController.getTotalHoldAmount()
                 );
                 returnGate = calculatorService.getChange();
                 // empty insertedcoin in controller
@@ -120,7 +112,7 @@ public class App {
         System.out.println("----------------------------------");
         StringBuilder inputAmount = new StringBuilder();
         inputAmount.append("[Input Amount]\n").append("\t" +
-                ""+shelveBoxController.getTotalCurrentHoldAmount()+"" +
+                ""+shelveBoxController.getTotalHoldAmount()+"" +
                 " JPY\n");
         System.out.println(inputAmount);
 
@@ -141,19 +133,19 @@ public class App {
         for (int i = 0; i < shelveBoxController.getAvailableGoods().size(); i++) {
             ShelveBox box = shelveBoxController.getShelveBoxFromIndex(i);
             hinter.setOutput(
-                    box.getStatus(shelveBoxController.getTotalCurrentHoldAmount()),
+                    box.getStatus(shelveBoxController.getTotalHoldAmount()),
                     "\t" + (i + 1) + ". " +
                             "" + box.getGoods().getName() + " " +
                             "" + box.getGoods().getPrice() + " JPY" + " " +
-                            "" + box.getStatusText(shelveBoxController.getTotalCurrentHoldAmount()));
+                            "" + box.getStatusText(shelveBoxController.getTotalHoldAmount()));
         }
 
         System.out.print("\n");
 
         System.out.println("[Outlet]");
-        System.out.print(selectedGoods.size() > 0 ? "" : "\tEmpty\n");
-        for (ShelveBox selectedGood : selectedGoods) {
-            hinter.setOutput(0, "\t" + selectedGood.getGoods().getName());
+        System.out.print(shelveBoxController.getSelectedGoods().size() > 0 ? "" : "\tEmpty\n");
+        for (Goods selectedGoods : shelveBoxController.getSelectedGoods()) {
+            hinter.setOutput(0, "\t" + selectedGoods.getName());
         }
         System.out.println("----------------------------------");
     }
