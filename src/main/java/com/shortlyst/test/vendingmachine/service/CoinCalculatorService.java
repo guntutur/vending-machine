@@ -31,7 +31,7 @@ public class CoinCalculatorService {
     private final int coin10limit = 9;
     private final int coin100limit = 4;
 
-    CoinCalculatorService(Collection<Integer> coinsAvailable, int totalAmount) {
+    public CoinCalculatorService(Collection<Integer> coinsAvailable, int totalAmount) {
         amount = totalAmount;
         coins = new ArrayList<>(coinsAvailable);
         Collections.sort(coins);
@@ -49,7 +49,7 @@ public class CoinCalculatorService {
         return isChangeAvailable;
     }
 
-    ArrayList<Integer> getChange() {
+    public ArrayList<Integer> getChange() {
         return change;
     }
 

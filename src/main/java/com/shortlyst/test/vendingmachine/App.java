@@ -14,9 +14,11 @@ import java.util.*;
 public class App {
 
     private ShelveBoxController shelveBoxController;
+    private CoinCalculatorService calculatorService;
     private Hinter hinter;
     Integer insertedCoin = 0;
-    List<ShelveBox> selectedGoods = new ArrayList<>();
+    private List<ShelveBox> selectedGoods = new ArrayList<>();
+    private List<Integer> returnGate = new ArrayList<>();
 
     private static final Collection<Integer> DEFAULT_COIN_STOCK = Arrays.asList(
             10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10,
@@ -35,6 +37,7 @@ public class App {
 
         hinter = new App().new Hinter();
         shelveBoxController = new ShelveBoxController().init();
+        calculatorService = new CoinCalculatorService(DEFAULT_COIN_STOCK);
 
         System.out.println("Welcome to Vending Machine ver 1.0-SNAPSHOT");
         System.out.println("Type help to see available command");
@@ -93,6 +96,12 @@ public class App {
                 }
                 break;
             case "3":
+                calculatorService = new CoinCalculatorService(
+                        DEFAULT_COIN_STOCK,
+                        (insertedCoin - shelveBoxController.getTotalHoldAmount())
+                );
+                returnGate = calculatorService.getChange();
+                insertedCoin = 0;
                 break;
             case "4":
                 break;
@@ -102,8 +111,6 @@ public class App {
     }
 
     private void status() {
-
-        CoinCalculatorService calculatorService = new CoinCalculatorService(DEFAULT_COIN_STOCK);
 
         System.out.println("----------------------------------");
         StringBuilder inputAmount = new StringBuilder();
@@ -115,7 +122,12 @@ public class App {
         change.append("\t10 JPY ").append(calculatorService.check10limit()+"\n");
         System.out.println(change);
 
-        System.out.println("[Return Gate]\n\tEmpty\n");
+        System.out.println("[Return Gate]");
+        System.out.print(returnGate.size() > 0 ? "" : "\tEmpty\n");
+        for (Integer pieceOfChange : returnGate) {
+            hinter.setOutput(0, "\t" + pieceOfChange + " JPY");
+        }
+        System.out.print("\n");
 
         System.out.println("[Items for sale]");
 
@@ -209,12 +221,12 @@ public class App {
             switch (fullCommand[0]) {
                 case "1" :
                 case "2" :
-                case "3" :
                     if (fullCommand.length == 1) {
                         setOutput(1, ERROR_HINT.replace("{cause}", MISSING_ARGUMENT));
                         valid = false;
                     }
                     break;
+                case "3" :
                 case "4" :
                 case "5" :
                     if (fullCommand.length > 1) {
