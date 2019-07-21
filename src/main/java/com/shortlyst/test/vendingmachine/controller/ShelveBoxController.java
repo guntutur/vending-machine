@@ -23,7 +23,6 @@ import java.util.List;
 public class ShelveBoxController implements IInput {
 
     private ShelveBoxService shelveBoxService = new ShelveBoxService();
-//    private int selectedShelf;
     private int totalCurrentHoldAmount = 0;
     private List<Integer> insertedCoin = new ArrayList<>();
     private List<Goods> selectedGoods = new ArrayList<>();
