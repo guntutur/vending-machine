@@ -5,6 +5,7 @@ import com.shortlyst.test.vendingmachine.domain.ShelveBox;
 import com.shortlyst.test.vendingmachine.service.ShelveBoxService;
 
 import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Created by zer0, the Maverick Hunter
@@ -45,9 +46,14 @@ public class ShelveBoxController implements IInput {
         return shelveBoxService.getAvailableGoods();
     }
 
-    public boolean selectGoodsAttempt(int index, int currentCoin) {
+    public boolean selectGoodsAttempt(List<ShelveBox> currentlyHoldShelve, int index, int currentCoin) {
         boolean proceed = true;
-        if (getGoodsFromIndex(index).getPrice() > currentCoin) {
+        int totalHoldPrice = 0;
+        for (ShelveBox box : currentlyHoldShelve) {
+            totalHoldPrice += box.getGoods().getPrice();
+        }
+        totalHoldPrice += getGoodsFromIndex(index).getPrice();
+        if (totalHoldPrice > currentCoin) {
             proceed = false;
         }
 

@@ -78,14 +78,18 @@ public class App {
                 break;
             case "2":
                 int selectedIndex = Integer.valueOf(fullCommand[1]) - 1;
-                if (shelveBoxController.selectGoodsAttempt(selectedIndex, insertedCoin)) {
-                    ShelveBox selected = new ShelveBox(
-                            shelveBoxController.getGoodsFromIndex(selectedIndex),
-                            1
-                    );
-                    selectedGoods.add(selected);
+                if (shelveBoxController.getShelveBoxFromIndex(selectedIndex).getQuantity() == 0) {
+                    hinter.setOutput(1, "Cannot select item, out of stock");
                 } else {
-                    hinter.setOutput(1, "Coin insufficient, try insert more");
+                    if (shelveBoxController.selectGoodsAttempt(selectedGoods, selectedIndex, insertedCoin)) {
+                        ShelveBox selected = new ShelveBox(
+                                shelveBoxController.getGoodsFromIndex(selectedIndex),
+                                1
+                        );
+                        selectedGoods.add(selected);
+                    } else {
+                        hinter.setOutput(1, "Coin insufficient, try insert more");
+                    }
                 }
                 break;
             case "3":
