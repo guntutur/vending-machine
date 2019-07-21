@@ -16,11 +16,6 @@ public class ShelveBoxController implements IInput {
     private ShelveBoxService shelveBoxService = new ShelveBoxService();
     private int selectedShelf;
 
-//    public ShelveBoxController(ShelveBoxService shelveBox, int selectedShelf) {
-//        this.shelveBoxService = shelveBox;
-//        this.selectedShelf = selectedShelf;
-//    }
-
     public ShelveBoxController init() {
         shelveBoxService.addToShelf("Canned coffee", 120, 3);
         shelveBoxService.addToShelf("Water PET bottle", 100, 0);

@@ -33,7 +33,7 @@ public class App {
     private void interactiveShell() {
 
         hinter = new App().new Hinter();
-        shelveBoxController = new ShelveBoxController();
+        shelveBoxController = new ShelveBoxController().init();
 
         System.out.println("Welcome to Vending Machine ver 1.0-SNAPSHOT");
         System.out.println("Type help to see available command");
