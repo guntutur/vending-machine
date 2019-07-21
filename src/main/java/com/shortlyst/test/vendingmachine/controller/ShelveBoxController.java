@@ -47,7 +47,7 @@ public class ShelveBoxController implements IInput {
 
     public boolean selectGoodsAttempt(int index, int currentCoin) {
         boolean proceed = true;
-        if (getGoodsFromIndex(index-1).getPrice() > currentCoin) {
+        if (getGoodsFromIndex(index).getPrice() > currentCoin) {
             proceed = false;
         }
 
@@ -59,6 +59,8 @@ public class ShelveBoxController implements IInput {
 
     }
 
+    // todo subtract quantity
+    // sent selected to outlet
     @Override
     public void selectShelf(int index) {
 

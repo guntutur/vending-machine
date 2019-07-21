@@ -4,10 +4,7 @@ import com.shortlyst.test.vendingmachine.controller.ShelveBoxController;
 import com.shortlyst.test.vendingmachine.domain.ShelveBox;
 import com.shortlyst.test.vendingmachine.service.CoinCalculatorService;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
 
 /**
  * Created by zer0, the Maverick Hunter
@@ -18,7 +15,8 @@ public class App {
 
     private ShelveBoxController shelveBoxController;
     private Hinter hinter;
-    public Integer insertedCoin = 0;
+    Integer insertedCoin = 0;
+    List<ShelveBox> selectedGoods = new ArrayList<>();
 
     private static final Collection<Integer> DEFAULT_COIN_STOCK = Arrays.asList(
             10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10,
@@ -72,7 +70,6 @@ public class App {
         switch (fullCommand[0]) {
             case "1":
                 int amount = Integer.valueOf(fullCommand[1]);
-                System.out.println(fullCommand[1]);
                 if (ACCEPTED_DENOMINATION_COIN.stream().noneMatch(s -> s.equals(amount))) {
                     hinter.setOutput(1, "Denomination is not acceptable, valid denomination are : " + String.join(", ", ACCEPTED_DENOMINATION_COIN.toString()));
                 } else {
@@ -80,10 +77,15 @@ public class App {
                 }
                 break;
             case "2":
-                if (shelveBoxController.selectGoodsAttempt(Integer.valueOf(fullCommand[1]), insertedCoin)) {
-                    shelveBoxController.selectShelf(Integer.valueOf(fullCommand[0]));
+                int selectedIndex = Integer.valueOf(fullCommand[1]) - 1;
+                if (shelveBoxController.selectGoodsAttempt(selectedIndex, insertedCoin)) {
+                    ShelveBox selected = new ShelveBox(
+                            shelveBoxController.getGoodsFromIndex(selectedIndex),
+                            1
+                    );
+                    selectedGoods.add(selected);
                 } else {
-                    hinter.setOutput(1, "Coin sufficient, try insert more");
+                    hinter.setOutput(1, "Coin insufficient, try insert more");
                 }
                 break;
             case "3":
@@ -125,7 +127,11 @@ public class App {
 
         System.out.print("\n");
 
-        System.out.println("[Outlet]\n\tEmpty");
+        System.out.println("[Outlet]");
+        System.out.print(selectedGoods.size() > 0 ? "" : "\tEmpty\n");
+        for (ShelveBox selectedGood : selectedGoods) {
+            hinter.setOutput(0, "\t" + selectedGood.getGoods().getName());
+        }
         System.out.println("----------------------------------");
     }
 
