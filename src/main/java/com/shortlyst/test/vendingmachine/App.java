@@ -1,12 +1,10 @@
 package com.shortlyst.test.vendingmachine;
 
+import com.shortlyst.test.vendingmachine.controller.ShelveBoxController;
 import com.shortlyst.test.vendingmachine.domain.ShelveBox;
 import com.shortlyst.test.vendingmachine.service.CoinCalculatorService;
-import com.shortlyst.test.vendingmachine.service.ShelveBoxService;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Scanner;
+import java.util.*;
 
 /**
  * Created by zer0, the Maverick Hunter
@@ -15,14 +13,17 @@ import java.util.Scanner;
  */
 public class App {
 
-    private ShelveBoxService shelveBox;
+    private ShelveBoxController shelveBoxController;
     private Hinter hinter;
-    public Integer insertedCoin = 0;
+    Integer insertedCoin = 0;
+    List<ShelveBox> selectedGoods = new ArrayList<>();
 
     private static final Collection<Integer> DEFAULT_COIN_STOCK = Arrays.asList(
             10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10,
             100, 100, 100, 100, 100, 100, 100, 100, 100, 100
     );
+
+    private static final Collection<Integer> ACCEPTED_DENOMINATION_COIN = Arrays.asList(10, 50, 100, 500);
 
     public static void main(String[] args) {
 
@@ -33,7 +34,7 @@ public class App {
     private void interactiveShell() {
 
         hinter = new App().new Hinter();
-        shelveBox = new ShelveBoxService().init();
+        shelveBoxController = new ShelveBoxController().init();
 
         System.out.println("Welcome to Vending Machine ver 1.0-SNAPSHOT");
         System.out.println("Type help to see available command");
@@ -64,13 +65,32 @@ public class App {
         }
     }
 
-    public void processCommand(String input) {
+    void processCommand(String input) {
         String[] fullCommand = input.split(" ");
         switch (fullCommand[0]) {
             case "1":
-                insertedCoin += Integer.valueOf(fullCommand[1]);
+                int amount = Integer.valueOf(fullCommand[1]);
+                if (ACCEPTED_DENOMINATION_COIN.stream().noneMatch(s -> s.equals(amount))) {
+                    hinter.setOutput(1, "Denomination is not acceptable, valid denomination are : " + String.join(", ", ACCEPTED_DENOMINATION_COIN.toString()));
+                } else {
+                    insertedCoin += amount;
+                }
                 break;
             case "2":
+                int selectedIndex = Integer.valueOf(fullCommand[1]) - 1;
+                if (shelveBoxController.getShelveBoxFromIndex(selectedIndex).getQuantity() == 0) {
+                    hinter.setOutput(1, "Cannot select item, out of stock");
+                } else {
+                    if (shelveBoxController.selectGoodsAttempt(selectedGoods, selectedIndex, insertedCoin)) {
+                        ShelveBox selected = new ShelveBox(
+                                shelveBoxController.getGoodsFromIndex(selectedIndex),
+                                1
+                        );
+                        selectedGoods.add(selected);
+                    } else {
+                        hinter.setOutput(1, "Coin insufficient, try insert more");
+                    }
+                }
                 break;
             case "3":
                 break;
@@ -99,14 +119,23 @@ public class App {
 
         System.out.println("[Items for sale]");
 
-        for (int i = 0; i < shelveBox.getAvailableGoods().size(); i++) {
-            ShelveBox box = shelveBox.getShelveBoxFromIndex(i);
-            hinter.setOutput(box.getStatus(insertedCoin), "\t" + (i + 1) + ". " + box.getGoods().getName() + " " + box.getGoods().getPrice() + " JPY");
+        for (int i = 0; i < shelveBoxController.getAvailableGoods().size(); i++) {
+            ShelveBox box = shelveBoxController.getShelveBoxFromIndex(i);
+            hinter.setOutput(
+                    box.getStatus(insertedCoin),
+                    "\t" + (i + 1) + ". " +
+                            "" + box.getGoods().getName() + " " +
+                            "" + box.getGoods().getPrice() + " JPY" + " " +
+                            "" + box.getStatusText(insertedCoin));
         }
 
         System.out.print("\n");
 
-        System.out.println("[Outlet]\n\tEmpty");
+        System.out.println("[Outlet]");
+        System.out.print(selectedGoods.size() > 0 ? "" : "\tEmpty\n");
+        for (ShelveBox selectedGood : selectedGoods) {
+            hinter.setOutput(0, "\t" + selectedGood.getGoods().getName());
+        }
         System.out.println("----------------------------------");
     }
 
@@ -119,10 +148,10 @@ public class App {
         void setOutput(Integer status, String output) {
             switch (status) {
                 case 1:
-                    System.out.println(ANSI_RED + output + " Out of stock" + ANSI_RESET);
+                    System.out.println(ANSI_RED + output + ANSI_RESET);
                     break;
                 case 2:
-                    System.out.println(ANSI_GREEN + output + " Available for purchase" + ANSI_RESET);
+                    System.out.println(ANSI_GREEN + output + ANSI_RESET);
                     break;
                 default:
                     System.out.println(output);
