@@ -78,7 +78,16 @@ public class App {
                 if (ACCEPTED_DENOMINATION_COIN.stream().noneMatch(s -> s.equals(amount))) {
                     hinter.setOutput(1, "Denomination is not acceptable, valid denomination are : " + String.join(", ", ACCEPTED_DENOMINATION_COIN.toString()));
                 } else {
-                    shelveBoxController.insertCoin(amount);
+
+                    if ((calculatorService.check10limit() == 0) && (calculatorService.check10limit() == 0)) {
+                        shelveBoxController.insertCoin(amount);
+                    } else if ((calculatorService.check10limit() == 1) && (amount == 10)) {
+                        shelveBoxController.insertCoin(amount);
+                    } else if ((calculatorService.check100limit() == 1) && ((amount == 10) || (amount == 50) || (amount == 100))) {
+                        shelveBoxController.insertCoin(amount);
+                    } else {
+                        hinter.setOutput(1, "Denomination is not acceptable, coin stock limit reached");
+                    }
                 }
                 statusV1(
                         shelveBoxController.getTotalHoldAmount(),
@@ -119,7 +128,9 @@ public class App {
                 break;
             case "4":
                 calculatorService.getRemainingCoins().addAll(shelveBoxController.getInsertedCoin());
+                COIN_STOCK_CONTAINER = calculatorService.getRemainingCoins();
                 hinter.setOutput(2, "Please collect your change in Return Gate");
+                calculatorService = new CoinCalculatorService(calculatorService.getRemainingCoins());
                 statusV1(
                         0,
                         availableGoodsLen,
@@ -133,7 +144,7 @@ public class App {
                 status();
                 break;
             case "6": // easter egg
-                calculatorService.getRemainingCoins().forEach(System.out::println);
+                COIN_STOCK_CONTAINER.forEach(System.out::println);
         }
     }
 
@@ -152,8 +163,8 @@ public class App {
         System.out.println(inputAmount);
 
         StringBuilder change = new StringBuilder("[Change]\n");
-        change.append("\t100 JPY ").append(calculatorService.check100limit()+"\n");
-        change.append("\t10 JPY ").append(calculatorService.check10limit()+"\n");
+        change.append("\t100 JPY ").append(calculatorService.check100limit() == 1 ? "No Change" : "Change").append("\n");
+        change.append("\t10 JPY ").append(calculatorService.check10limit() == 1 ? "No Change" : "Change").append("\n");
         System.out.println(change);
 
         System.out.println("[Return Gate]");
@@ -195,8 +206,8 @@ public class App {
         System.out.println(inputAmount);
 
         StringBuilder change = new StringBuilder("[Change]\n");
-        change.append("\t100 JPY ").append(calculatorService.check100limit()+"\n");
-        change.append("\t10 JPY ").append(calculatorService.check10limit()+"\n");
+        change.append("\t100 JPY ").append(calculatorService.check100limit() == 1 ? "No Change" : "Change").append("\n");
+        change.append("\t10 JPY ").append(calculatorService.check10limit() == 1 ? "No Change" : "Change").append("\n");
         System.out.println(change);
 
         System.out.println("[Return Gate]");

@@ -46,7 +46,7 @@ public class CoinCalculatorService {
         Collections.reverse(coins);
     }
 
-    boolean isChangeAvailable() {
+    public boolean isChangeAvailable() {
         return isChangeAvailable;
     }
 
@@ -62,12 +62,12 @@ public class CoinCalculatorService {
         return Collections.frequency(coins, defaultDenomination);
     }
 
-    public String check10limit() {
-        return getRemainingCoins(10) < coin10limit ? "No Change" : "Change";
+    public int check10limit() {
+        return getRemainingCoins(10) < coin10limit ? 1 : 0;
     }
 
-    public String check100limit() {
-        return getRemainingCoins(100) < coin100limit ? "No Change" : "Change";
+    public int check100limit() {
+        return getRemainingCoins(100) < coin100limit ? 1 : 0;
     }
 
     private void calculate() {
