@@ -25,13 +25,15 @@ public class App {
             100, 100, 100, 100, 100, 100, 100, 100, 100, 100
     );
 
+    private static List<Integer> COIN_STOCK_CONTAINER = new ArrayList<>(DEFAULT_COIN_STOCK);
+
     private static final Collection<Integer> ACCEPTED_DENOMINATION_COIN = Arrays.asList(10, 50, 100, 500);
 
     public static void main(String[] args) {
 
         App app = new App();
         shelveBoxController = new ShelveBoxController().init();
-        calculatorService = new CoinCalculatorService(DEFAULT_COIN_STOCK);
+        calculatorService = new CoinCalculatorService(COIN_STOCK_CONTAINER);
         hinter = new App().new Hinter();
         app.interactiveShell();
     }
@@ -62,12 +64,13 @@ public class App {
                     break;
                 default:
                     if (hinter.validateCommand(theAbsoluteRealInput)) processCommand(theAbsoluteRealInput);
-                    status();
+//                    status();
             }
         }
     }
 
-    void processCommand(String input) {
+    private void processCommand(String input) {
+        int availableGoodsLen = shelveBoxController.getAvailableGoods().size();
         String[] fullCommand = input.split(" ");
         switch (fullCommand[0]) {
             case "1":
@@ -77,6 +80,11 @@ public class App {
                 } else {
                     shelveBoxController.insertCoin(amount);
                 }
+                statusV1(
+                        shelveBoxController.getTotalHoldAmount(),
+                        availableGoodsLen,
+                        shelveBoxController.getSelectedGoods()
+                );
                 break;
             case "2":
                 int selectedIndex = Integer.valueOf(fullCommand[1]) - 1;
@@ -90,21 +98,48 @@ public class App {
                         hinter.setOutput(1, "Coin insufficient, try insert more");
                     }
                 }
+                statusV1(
+                        shelveBoxController.getTotalHoldAmount(),
+                        availableGoodsLen,
+                        shelveBoxController.getSelectedGoods()
+                );
                 break;
             case "3":
                 calculatorService = new CoinCalculatorService(
-                        DEFAULT_COIN_STOCK,
+                        COIN_STOCK_CONTAINER,
                         shelveBoxController.getTotalHoldAmount()
                 );
                 returnGate = calculatorService.getChange();
-                // empty insertedcoin in controller
+                hinter.setOutput(2, "Your change is being prepared, you may now empty the Outlet");
+                statusV1(
+                        shelveBoxController.getTotalHoldAmount(),
+                        availableGoodsLen,
+                        shelveBoxController.getSelectedGoods()
+                );
                 break;
             case "4":
-
+                calculatorService.getRemainingCoins().addAll(shelveBoxController.getInsertedCoin());
+                hinter.setOutput(2, "Please collect your change in Return Gate");
+                statusV1(
+                        0,
+                        availableGoodsLen,
+                        shelveBoxController.getSelectedGoods()
+                );
+                reset();
                 break;
             case "5":
+                reset();
+                hinter.setOutput(2, "Thank you for using our service");
+                status();
                 break;
+            case "6": // easter egg
+                calculatorService.getRemainingCoins().forEach(System.out::println);
         }
+    }
+
+    private void reset() {
+        shelveBoxController.reset();
+        returnGate = new ArrayList<>();
     }
 
     private void status() {
@@ -150,11 +185,54 @@ public class App {
         System.out.println("----------------------------------");
     }
 
+    private void statusV1(int totalHoldAmount, int availableGoodsSize, List<Goods> selectedGoods) {
+
+        System.out.println("----------------------------------");
+        StringBuilder inputAmount = new StringBuilder();
+        inputAmount.append("[Input Amount]\n").append("\t" +
+                ""+totalHoldAmount+"" +
+                " JPY\n");
+        System.out.println(inputAmount);
+
+        StringBuilder change = new StringBuilder("[Change]\n");
+        change.append("\t100 JPY ").append(calculatorService.check100limit()+"\n");
+        change.append("\t10 JPY ").append(calculatorService.check10limit()+"\n");
+        System.out.println(change);
+
+        System.out.println("[Return Gate]");
+        System.out.print(returnGate.size() > 0 ? "" : "\tEmpty\n");
+        for (Integer pieceOfChange : returnGate) {
+            hinter.setOutput(0, "\t" + pieceOfChange + " JPY");
+        }
+        System.out.print("\n");
+
+        System.out.println("[Items for sale]");
+
+        for (int i = 0; i < availableGoodsSize; i++) {
+            ShelveBox box = shelveBoxController.getShelveBoxFromIndex(i);
+            hinter.setOutput(
+                    box.getStatus(totalHoldAmount),
+                    "\t" + (i + 1) + ". " +
+                            "" + box.getGoods().getName() + " " +
+                            "" + box.getGoods().getPrice() + " JPY" + " " +
+                            "" + box.getStatusText(totalHoldAmount));
+        }
+
+        System.out.print("\n");
+
+        System.out.println("[Outlet]");
+        System.out.print(selectedGoods.size() > 0 ? "" : "\tEmpty\n");
+        for (Goods goods : selectedGoods) {
+            hinter.setOutput(0, "\t" + goods.getName());
+        }
+        System.out.println("----------------------------------");
+    }
+
     class Hinter {
         static final String ANSI_RESET = "\u001B[0m";
         static final String ANSI_RED = "\u001B[31m";
         static final String ANSI_GREEN = "\u001B[32m";
-        private final String[] RECOGNIZED_COMMAND = {"1", "2", "3", "4", "5"};
+        private final String[] RECOGNIZED_COMMAND = {"1", "2", "3", "4", "5", "6"};
 
         void setOutput(Integer status, String output) {
             switch (status) {
@@ -228,6 +306,7 @@ public class App {
                 case "3" :
                 case "4" :
                 case "5" :
+                case "6" :
                     if (fullCommand.length > 1) {
                         setOutput(1, ERROR_HINT.replace("{cause}", NOT_ACCEPT_ARG));
                         valid = false;

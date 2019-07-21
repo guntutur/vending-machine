@@ -7,7 +7,7 @@ package com.shortlyst.test.vendingmachine.controller;
  */
 public interface IInput {
 
-    void cancel();
+    void reset();
 
     void selectShelf(int index);
 
