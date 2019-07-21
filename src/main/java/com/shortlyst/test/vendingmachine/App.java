@@ -1,9 +1,8 @@
 package com.shortlyst.test.vendingmachine;
 
-import com.shortlyst.test.vendingmachine.domain.Goods;
 import com.shortlyst.test.vendingmachine.domain.ShelveBox;
-import com.shortlyst.test.vendingmachine.service.ShelveBoxService;
 import com.shortlyst.test.vendingmachine.service.CoinCalculatorService;
+import com.shortlyst.test.vendingmachine.service.ShelveBoxService;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -18,7 +17,7 @@ public class App {
 
     private ShelveBoxService shelveBox;
     private Hinter hinter;
-    private Integer insertedCoin = 0;
+    public Integer insertedCoin = 0;
 
     private static final Collection<Integer> DEFAULT_COIN_STOCK = Arrays.asList(
             10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10,
@@ -42,15 +41,15 @@ public class App {
         System.out.println("Status : ");
         status();
 
-        String theInput;
+        String theAbsoluteRealInput;
         Scanner scanner = new Scanner(System.in);
 
         while (true) {
 
             System.out.print("> ");
-            theInput = scanner.nextLine();
+            theAbsoluteRealInput = scanner.nextLine();
 
-            switch (theInput) {
+            switch (theAbsoluteRealInput) {
                 case "help" :
                     hinter.help();
                     break;
@@ -59,8 +58,27 @@ public class App {
                     System.exit(1);
                     break;
                 default:
-                    System.out.println(theInput);
+                    if (hinter.validateCommand(theAbsoluteRealInput)) processCommand(theAbsoluteRealInput);
             }
+
+            status();
+        }
+    }
+
+    public void processCommand(String input) {
+        String[] fullCommand = input.split(" ");
+        switch (fullCommand[0]) {
+            case "1":
+                insertedCoin += Integer.valueOf(fullCommand[1]);
+                break;
+            case "2":
+                break;
+            case "3":
+                break;
+            case "4":
+                break;
+            case "5":
+                break;
         }
     }
 
@@ -84,7 +102,7 @@ public class App {
 
         for (int i = 0; i < shelveBox.getAvailableGoods().size(); i++) {
             ShelveBox box = shelveBox.getShelveBoxFromIndex(i);
-            hinter.setOutput(box.getStatus(insertedCoin), (i + 1) + ". " + box.getGoods().getName() + " " + box.getGoods().getPrice() + " JPY");
+            hinter.setOutput(box.getStatus(insertedCoin), "\t" + (i + 1) + ". " + box.getGoods().getName() + " " + box.getGoods().getPrice() + " JPY");
         }
 
         System.out.print("\n");
@@ -97,17 +115,18 @@ public class App {
         static final String ANSI_RESET = "\u001B[0m";
         static final String ANSI_RED = "\u001B[31m";
         static final String ANSI_GREEN = "\u001B[32m";
+        private final String[] RECOGNIZED_COMMAND = {"1", "2", "3", "4", "5"};
 
         void setOutput(Integer status, String output) {
             switch (status) {
                 case 1:
-                    System.out.println("\t" + ANSI_RED + output + " Out of stock" + ANSI_RESET);
+                    System.out.println(ANSI_RED + output + " Out of stock" + ANSI_RESET);
                     break;
                 case 2:
-                    System.out.println("\t" + ANSI_GREEN + output + " Available for purchase" + ANSI_RESET);
+                    System.out.println(ANSI_GREEN + output + " Available for purchase" + ANSI_RESET);
                     break;
                 default:
-                    System.out.println("\t" + output);
+                    System.out.println(output);
                     break;
             }
         }
@@ -147,6 +166,42 @@ public class App {
                     "For example: “5” (Get returned coins)";
 
             System.out.println(help);
+        }
+
+        boolean validateCommand(String input) {
+            boolean valid = true;
+
+            String ERROR_HINT = "Command {cause}, type help for available command with usage";
+            String MISSING_ARGUMENT = "missing one or more argument";
+            String NOT_ACCEPT_ARG = "command does not accept any argument";
+            String NOT_RECOGNIZED = "not recognized";
+
+            String[] fullCommand = input.split(" ");
+
+            switch (fullCommand[0]) {
+                case "1" :
+                case "2" :
+                case "3" :
+                    if (fullCommand.length == 1) {
+                        setOutput(1, ERROR_HINT.replace("{cause}", MISSING_ARGUMENT));
+                        valid = false;
+                    }
+                    break;
+                case "4" :
+                case "5" :
+                    if (fullCommand.length > 1) {
+                        setOutput(1, ERROR_HINT.replace("{cause}", NOT_ACCEPT_ARG));
+                        valid = false;
+                    }
+                    break;
+            }
+
+            if (Arrays.stream(RECOGNIZED_COMMAND).noneMatch(fullCommand[0]::equals)) {
+                setOutput(1, ERROR_HINT.replace("{cause}", NOT_RECOGNIZED));
+                valid = false;
+            }
+
+            return valid;
         }
     }
 }
