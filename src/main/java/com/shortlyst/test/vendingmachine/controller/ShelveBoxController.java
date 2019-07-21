@@ -4,6 +4,7 @@ import com.shortlyst.test.vendingmachine.domain.Goods;
 import com.shortlyst.test.vendingmachine.domain.ShelveBox;
 import com.shortlyst.test.vendingmachine.service.ShelveBoxService;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -22,8 +23,11 @@ import java.util.List;
 public class ShelveBoxController implements IInput {
 
     private ShelveBoxService shelveBoxService = new ShelveBoxService();
-    private int selectedShelf;
+//    private int selectedShelf;
     private int totalHoldAmount = 0;
+    private int totalCurrentHoldAmount = 0;
+    private List<Integer> insertedCoin = new ArrayList<>();
+    private List<Goods> selectedGoods = new ArrayList<>();
 
     public ShelveBoxController init() {
         shelveBoxService.addToShelf("Canned coffee", 120, 3);
@@ -54,20 +58,48 @@ public class ShelveBoxController implements IInput {
         return shelveBoxService.getAvailableGoods();
     }
 
-    public boolean selectGoodsAttempt(List<ShelveBox> currentlyHoldShelve, int index, int currentCoin) {
-        boolean proceed = true;
+//    public boolean selectGoodsAttempt(List<ShelveBox> currentlyHoldShelves, int index, int currentCoin) {
+//        boolean proceed = true;
+//        int totalHoldPrice = 0;
+//        for (ShelveBox box : currentlyHoldShelves) {
+//            totalHoldPrice += box.getGoods().getPrice();
+//        }
+//        totalHoldPrice += getGoodsFromIndex(index).getPrice();
+//        if (totalHoldPrice > currentCoin) {
+//            proceed = false;
+//        }
+//
+//        totalHoldAmount = totalHoldPrice;
+//
+//        return proceed;
+//    }
+
+    public int getTotalHoldAmount() {
         int totalHoldPrice = 0;
-        for (ShelveBox box : currentlyHoldShelve) {
-            totalHoldPrice += box.getGoods().getPrice();
+        for (Goods goods : selectedGoods) {
+            totalHoldPrice += goods.getPrice();
         }
-        totalHoldPrice += getGoodsFromIndex(index).getPrice();
-        if (totalHoldPrice > currentCoin) {
-            proceed = false;
-        }
+        return sumInsertedCoin() - totalHoldPrice;
+    }
 
-        totalHoldAmount = totalHoldPrice;
+    public int getTotalCurrentHoldAmount() {
+        return sumInsertedCoin() - getTotalHoldAmount();
+    }
 
-        return proceed;
+    private Integer sumInsertedCoin() {
+        return insertedCoin.stream().mapToInt(a -> a).sum();
+    }
+
+    public boolean canProceed() {
+        return sumInsertedCoin() > getTotalCurrentHoldAmount();
+    }
+
+    public void removeFromContainer() {
+        selectedGoods.remove(selectedGoods.size()-1);
+    }
+
+    public List<Goods> getSelectedGoods() {
+        return selectedGoods;
     }
 
     @Override
@@ -75,19 +107,18 @@ public class ShelveBoxController implements IInput {
 
     }
 
-    // todo subtract quantity
-    // sent selected to outlet
     @Override
     public void selectShelf(int index) {
-
+        selectedGoods.add(shelveBoxService.releaseGoodsFromIndex(index));
+        selectedGoods.forEach(goods -> totalCurrentHoldAmount += goods.getPrice());
     }
 
     @Override
-    public void insertCoin(Double coin) {
-
+    public void insertCoin(int coin) {
+        insertedCoin.add(coin);
     }
 
-    public int getTotalHoldAmount() {
-        return totalHoldAmount;
+    public void test() {
+        System.out.println("anuan");
     }
 }

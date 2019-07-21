@@ -11,6 +11,6 @@ public interface IInput {
 
     void selectShelf(int index);
 
-    void insertCoin(Double coin);
+    void insertCoin(int coin);
 
 }
