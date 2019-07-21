@@ -11,11 +11,19 @@ import java.util.List;
  * Created by zer0, the Maverick Hunter
  * on 21/07/19.
  * Class: ShelveBoxController.java
+ *
+ * implement rule no 4 of vending.md
+ * 4. State of whether or not the items can be purchased is as following
+ *         - Item is out of stock and Item price > Inserted amount -> Cannot purchase [Sold out]
+ *         - Item is out of stock and Item price ≦ Inserted amount -> Cannot purchase [Sold out]
+ *         - Item is in stock and Item price > Inserted amount -> Cannot purchase [Display nothing]
+ *         - Item is out of stock and Item price ≧ Inserted amount -> Can purchase [Can purchase]
  */
 public class ShelveBoxController implements IInput {
 
     private ShelveBoxService shelveBoxService = new ShelveBoxService();
     private int selectedShelf;
+    private int totalHoldAmount = 0;
 
     public ShelveBoxController init() {
         shelveBoxService.addToShelf("Canned coffee", 120, 3);
@@ -57,6 +65,8 @@ public class ShelveBoxController implements IInput {
             proceed = false;
         }
 
+        totalHoldAmount = totalHoldPrice;
+
         return proceed;
     }
 
@@ -75,5 +85,9 @@ public class ShelveBoxController implements IInput {
     @Override
     public void insertCoin(Double coin) {
 
+    }
+
+    public int getTotalHoldAmount() {
+        return totalHoldAmount;
     }
 }
