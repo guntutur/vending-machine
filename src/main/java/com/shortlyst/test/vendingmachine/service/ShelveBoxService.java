@@ -22,13 +22,6 @@ public class ShelveBoxService {
         return this;
     }
 
-    public ShelveBoxService init() {
-        addToShelf("Canned coffee", 120, 3);
-        addToShelf("Water PET bottle", 100, 0);
-        addToShelf("Sport drinks", 150, 5);
-        return this;
-    }
-
     /**
      * @return - checks if the shelves are completely empty
      */

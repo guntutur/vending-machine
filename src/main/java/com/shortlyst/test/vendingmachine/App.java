@@ -1,8 +1,8 @@
 package com.shortlyst.test.vendingmachine;
 
+import com.shortlyst.test.vendingmachine.controller.ShelveBoxController;
 import com.shortlyst.test.vendingmachine.domain.ShelveBox;
 import com.shortlyst.test.vendingmachine.service.CoinCalculatorService;
-import com.shortlyst.test.vendingmachine.service.ShelveBoxService;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -15,7 +15,7 @@ import java.util.Scanner;
  */
 public class App {
 
-    private ShelveBoxService shelveBox;
+    private ShelveBoxController shelveBoxController;
     private Hinter hinter;
     public Integer insertedCoin = 0;
 
@@ -33,7 +33,7 @@ public class App {
     private void interactiveShell() {
 
         hinter = new App().new Hinter();
-        shelveBox = new ShelveBoxService().init();
+        shelveBoxController = new ShelveBoxController();
 
         System.out.println("Welcome to Vending Machine ver 1.0-SNAPSHOT");
         System.out.println("Type help to see available command");
@@ -64,13 +64,14 @@ public class App {
         }
     }
 
-    public void processCommand(String input) {
+    void processCommand(String input) {
         String[] fullCommand = input.split(" ");
         switch (fullCommand[0]) {
             case "1":
                 insertedCoin += Integer.valueOf(fullCommand[1]);
                 break;
             case "2":
+
                 break;
             case "3":
                 break;
@@ -99,8 +100,8 @@ public class App {
 
         System.out.println("[Items for sale]");
 
-        for (int i = 0; i < shelveBox.getAvailableGoods().size(); i++) {
-            ShelveBox box = shelveBox.getShelveBoxFromIndex(i);
+        for (int i = 0; i < shelveBoxController.getAvailableGoods().size(); i++) {
+            ShelveBox box = shelveBoxController.getShelveBoxFromIndex(i);
             hinter.setOutput(box.getStatus(insertedCoin), "\t" + (i + 1) + ". " + box.getGoods().getName() + " " + box.getGoods().getPrice() + " JPY");
         }
 
