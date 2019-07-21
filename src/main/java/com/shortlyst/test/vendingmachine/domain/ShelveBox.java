@@ -32,9 +32,8 @@ public class ShelveBox {
     }
 
     public Integer getStatus(Integer insertedCoin) {
-        int status = 0;
-        if (quantity == 0) status = 1;
-        if (insertedCoin > goods.getPrice()) status = 2;
-        return status;
+        if (quantity == 0) return 1;
+        if (insertedCoin > goods.getPrice()) return 2;
+        return 0;
     }
 }
