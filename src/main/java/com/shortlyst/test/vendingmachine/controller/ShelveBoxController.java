@@ -45,6 +45,15 @@ public class ShelveBoxController implements IInput {
         return shelveBoxService.getAvailableGoods();
     }
 
+    public boolean selectGoodsAttempt(int index, int currentCoin) {
+        boolean proceed = true;
+        if (getGoodsFromIndex(index-1).getPrice() > currentCoin) {
+            proceed = false;
+        }
+
+        return proceed;
+    }
+
     @Override
     public void cancel() {
 

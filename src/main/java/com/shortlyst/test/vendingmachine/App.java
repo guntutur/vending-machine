@@ -71,7 +71,11 @@ public class App {
                 insertedCoin += Integer.valueOf(fullCommand[1]);
                 break;
             case "2":
-
+                if (shelveBoxController.selectGoodsAttempt(Integer.valueOf(fullCommand[1]), insertedCoin)) {
+                    shelveBoxController.selectShelf(Integer.valueOf(fullCommand[0]));
+                } else {
+                    hinter.setOutput(1, "Coin sufficient, try to insert another");
+                }
                 break;
             case "3":
                 break;
@@ -102,7 +106,12 @@ public class App {
 
         for (int i = 0; i < shelveBoxController.getAvailableGoods().size(); i++) {
             ShelveBox box = shelveBoxController.getShelveBoxFromIndex(i);
-            hinter.setOutput(box.getStatus(insertedCoin), "\t" + (i + 1) + ". " + box.getGoods().getName() + " " + box.getGoods().getPrice() + " JPY");
+            hinter.setOutput(
+                    box.getStatus(insertedCoin),
+                    "\t" + (i + 1) + ". " +
+                            "" + box.getGoods().getName() + " " +
+                            "" + box.getGoods().getPrice() + " JPY" + " " +
+                            "" + box.getStatusText(insertedCoin));
         }
 
         System.out.print("\n");
@@ -120,10 +129,10 @@ public class App {
         void setOutput(Integer status, String output) {
             switch (status) {
                 case 1:
-                    System.out.println(ANSI_RED + output + " Out of stock" + ANSI_RESET);
+                    System.out.println(ANSI_RED + output + ANSI_RESET);
                     break;
                 case 2:
-                    System.out.println(ANSI_GREEN + output + " Available for purchase" + ANSI_RESET);
+                    System.out.println(ANSI_GREEN + output + ANSI_RESET);
                     break;
                 default:
                     System.out.println(output);
