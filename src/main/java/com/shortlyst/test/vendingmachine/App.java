@@ -74,7 +74,7 @@ public class App {
                 if (shelveBoxController.selectGoodsAttempt(Integer.valueOf(fullCommand[1]), insertedCoin)) {
                     shelveBoxController.selectShelf(Integer.valueOf(fullCommand[0]));
                 } else {
-                    hinter.setOutput(1, "Coin sufficient, try to insert another");
+                    hinter.setOutput(1, "Coin sufficient, try insert more");
                 }
                 break;
             case "3":
