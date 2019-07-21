@@ -33,13 +33,13 @@ public class ShelveBox {
 
     public Integer getStatus(Integer insertedCoin) {
         if (quantity == 0) return 1;
-        if (insertedCoin > goods.getPrice()) return 2;
+        if (insertedCoin >= goods.getPrice()) return 2;
         return 0;
     }
 
     public String getStatusText(Integer insertedCoin) {
         if (quantity == 0) return "Out of Stock";
-        if (insertedCoin > goods.getPrice()) return "Available for Purchase";
+        if (insertedCoin >= goods.getPrice()) return "Available for Purchase";
         return "";
     }
 }

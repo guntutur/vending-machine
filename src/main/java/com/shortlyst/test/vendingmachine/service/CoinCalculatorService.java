@@ -30,6 +30,7 @@ public class CoinCalculatorService {
     private boolean isChangeAvailable = false;
     private final int coin10limit = 9;
     private final int coin100limit = 4;
+    private List<Integer> insertedCoin = new ArrayList<>();
 
     public CoinCalculatorService(Collection<Integer> coinsAvailable, int totalAmount) {
         amount = totalAmount;
@@ -53,7 +54,7 @@ public class CoinCalculatorService {
         return change;
     }
 
-    List<Integer> getRemainingCoins() {
+    public List<Integer> getRemainingCoins() {
         return remainingCoins;
     }
 
@@ -66,7 +67,7 @@ public class CoinCalculatorService {
     }
 
     public String check100limit() {
-        return getRemainingCoins(100) < coin10limit ? "No Change" : "Change";
+        return getRemainingCoins(100) < coin100limit ? "No Change" : "Change";
     }
 
     private void calculate() {
@@ -100,5 +101,13 @@ public class CoinCalculatorService {
         if (!isChangeAvailable) {
             remainingCoins = coins;
         }
+    }
+
+    public List<Integer> getInsertedCoin() {
+        return insertedCoin;
+    }
+
+    public void setInsertedCoin(List<Integer> insertedCoin) {
+        this.insertedCoin = insertedCoin;
     }
 }

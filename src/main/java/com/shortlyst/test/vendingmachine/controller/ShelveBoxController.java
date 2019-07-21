@@ -4,6 +4,7 @@ import com.shortlyst.test.vendingmachine.domain.Goods;
 import com.shortlyst.test.vendingmachine.domain.ShelveBox;
 import com.shortlyst.test.vendingmachine.service.ShelveBoxService;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -24,6 +25,8 @@ public class ShelveBoxController implements IInput {
     private ShelveBoxService shelveBoxService = new ShelveBoxService();
     private int selectedShelf;
     private int totalHoldAmount = 0;
+    private int totalCurrentHoldAmount = 0;
+    private List<Integer> insertedCoin = new ArrayList<>();
 
     public ShelveBoxController init() {
         shelveBoxService.addToShelf("Canned coffee", 120, 3);
@@ -87,7 +90,19 @@ public class ShelveBoxController implements IInput {
 
     }
 
-    public int getTotalHoldAmount() {
+    private int getTotalHoldAmount() {
         return totalHoldAmount;
+    }
+
+    public void addCoin(Integer amount) {
+        insertedCoin.add(amount);
+    }
+
+    public int getTotalCurrentHoldAmount() {
+        return sumInsertedCoin() - getTotalHoldAmount();
+    }
+
+    private Integer sumInsertedCoin() {
+        return insertedCoin.stream().mapToInt(a -> a).sum();
     }
 }
