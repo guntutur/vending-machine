@@ -6,6 +6,7 @@ import com.shortlyst.test.vendingmachine.service.CoinCalculatorService;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import java.util.Scanner;
 
 /**
@@ -23,6 +24,8 @@ public class App {
             10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10,
             100, 100, 100, 100, 100, 100, 100, 100, 100, 100
     );
+
+    private static final Collection<Integer> ACCEPTED_DENOMINATION_COIN = Arrays.asList(10, 50, 100, 500);
 
     public static void main(String[] args) {
 
@@ -68,7 +71,13 @@ public class App {
         String[] fullCommand = input.split(" ");
         switch (fullCommand[0]) {
             case "1":
-                insertedCoin += Integer.valueOf(fullCommand[1]);
+                int amount = Integer.valueOf(fullCommand[1]);
+                System.out.println(fullCommand[1]);
+                if (ACCEPTED_DENOMINATION_COIN.stream().noneMatch(s -> s.equals(amount))) {
+                    hinter.setOutput(1, "Denomination is not acceptable, valid denomination are : " + String.join(", ", ACCEPTED_DENOMINATION_COIN.toString()));
+                } else {
+                    insertedCoin += amount;
+                }
                 break;
             case "2":
                 if (shelveBoxController.selectGoodsAttempt(Integer.valueOf(fullCommand[1]), insertedCoin)) {
