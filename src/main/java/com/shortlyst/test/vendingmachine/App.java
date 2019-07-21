@@ -59,9 +59,8 @@ public class App {
                     break;
                 default:
                     if (hinter.validateCommand(theAbsoluteRealInput)) processCommand(theAbsoluteRealInput);
+                    status();
             }
-
-            status();
         }
     }
 
