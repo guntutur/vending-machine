@@ -23,7 +23,7 @@ public class App {
         this.calculatorService = new CoinCalculatorService(COIN_STOCK_CONTAINER);
     }
 
-    App(ShelveBoxController shelveBoxController, CoinCalculatorService coinCalculatorService) {
+    public App(ShelveBoxController shelveBoxController, CoinCalculatorService coinCalculatorService) {
         this.shelveBoxController = shelveBoxController;
         this.calculatorService = coinCalculatorService;
     }
@@ -82,7 +82,7 @@ public class App {
         }
     }
 
-    String processCommand(String input) {
+    public String processCommand(String input) {
 
         StringBuilder systemResponse = new StringBuilder();
 

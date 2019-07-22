@@ -54,4 +54,15 @@ public class ShelveBoxTest {
         Assert.assertThat(shelveBox.getShelveBoxFromIndex(0).getGoods().getName(), CoreMatchers.is("Energy Drink"));
         Assert.assertThat(shelveBox.getShelveBoxFromIndex(1).getGoods().getName(), CoreMatchers.is("Apple Juice"));
     }
+
+    @Test
+    public void assertGoodsReleased() {
+        shelveBox.addToShelf("Energy Drink", 120, 2);
+        shelveBox.releaseGoodsFromIndex(0);
+
+        int currentStock = shelveBox.getShelveBoxFromIndex(0).getQuantity();
+
+        Assert.assertEquals(1, currentStock);
+
+    }
 }
