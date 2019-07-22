@@ -1,6 +1,7 @@
 package com.shortlyst.test.vendingmachine.domain;
 
 import com.shortlyst.test.vendingmachine.service.ShelveBoxService;
+import org.hamcrest.CoreMatchers;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -43,5 +44,14 @@ public class ShelveBoxTest {
         Assert.assertFalse(shelveBox.isEmpty());
         shelveBox.releaseGoodsFromIndex(1);
         Assert.assertFalse(shelveBox.isEmpty());
+    }
+
+    @Test
+    public void assertMatchAtIndex() {
+        shelveBox.addToShelf("Energy Drink", 120, 1);
+        shelveBox.addToShelf("Apple Juice", 110, 1);
+
+        Assert.assertThat(shelveBox.getShelveBoxFromIndex(0).getGoods().getName(), CoreMatchers.is("Energy Drink"));
+        Assert.assertThat(shelveBox.getShelveBoxFromIndex(1).getGoods().getName(), CoreMatchers.is("Apple Juice"));
     }
 }

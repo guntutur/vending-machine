@@ -16,12 +16,16 @@ public class App {
 
     private ShelveBoxController shelveBoxController;
     private CoinCalculatorService calculatorService;
-    private Hinter hinter;
+    private Hinter hinter = new Hinter();
 
     App() {
         this.shelveBoxController = new ShelveBoxController().init();
         this.calculatorService = new CoinCalculatorService(COIN_STOCK_CONTAINER);
-        this.hinter = new Hinter();
+    }
+
+    App(ShelveBoxController shelveBoxController, CoinCalculatorService coinCalculatorService) {
+        this.shelveBoxController = shelveBoxController;
+        this.calculatorService = coinCalculatorService;
     }
 
     private List<Integer> returnGate = new ArrayList<>();
@@ -75,7 +79,7 @@ public class App {
 
     String processCommand(String input) {
 
-        String systemResponse = "";
+        StringBuilder systemResponse = new StringBuilder();
 
         int availableGoodsLen = shelveBoxController.getAvailableGoods().size();
         String[] fullCommand = input.split(" ");
@@ -83,42 +87,42 @@ public class App {
             case "1":
                 int amount = Integer.valueOf(fullCommand[1]);
                 if (ACCEPTED_DENOMINATION_COIN.stream().noneMatch(s -> s.equals(amount))) {
-                    systemResponse += hinter.setOutput(1, "Denomination is not acceptable, valid denomination are : " + String.join(", ", ACCEPTED_DENOMINATION_COIN.toString()) + "\n");
+                    systemResponse.append(hinter.setOutput(1, "Denomination is not acceptable, valid denomination are : " + String.join(", ", ACCEPTED_DENOMINATION_COIN.toString()))).append("\n");
                 } else {
 
-                    if ((calculatorService.check10limit() == 0) && (calculatorService.check10limit() == 0)) {
+                    if ((calculatorService.check10limit() == 0) && (calculatorService.check100limit() == 0)) {
                         shelveBoxController.insertCoin(amount);
                     } else if ((calculatorService.check10limit() == 1) && (amount == 10)) {
                         shelveBoxController.insertCoin(amount);
                     } else if ((calculatorService.check100limit() == 1) && ((amount == 10) || (amount == 50) || (amount == 100))) {
                         shelveBoxController.insertCoin(amount);
                     } else {
-                        systemResponse += hinter.setOutput(1, "Denomination is not acceptable, coin stock limit reached\n");
+                        systemResponse.append(hinter.setOutput(1, "Denomination is not acceptable, coin stock limit reached")).append("\n");
                     }
                 }
-                systemResponse += statusWithArgs(
+                systemResponse.append(statusWithArgs(
                         shelveBoxController.getTotalHoldAmount(),
                         availableGoodsLen,
                         shelveBoxController.getSelectedGoods()
-                );
+                ));
                 break;
             case "2":
                 int selectedIndex = Integer.valueOf(fullCommand[1]) - 1;
                 if (shelveBoxController.getShelveBoxFromIndex(selectedIndex).getQuantity() == 0) {
-                    systemResponse += hinter.setOutput(1, "Cannot select item, out of stock\n");
+                    systemResponse.append(hinter.setOutput(1, "Cannot select item, out of stock")).append("\n");
                 } else {
 
                     shelveBoxController.selectShelf(selectedIndex);
                     if (!shelveBoxController.canProceed()) {
                         shelveBoxController.removeFromContainer();
-                        systemResponse += hinter.setOutput(1, "Coin insufficient, try insert more\n");
+                        systemResponse.append(hinter.setOutput(1, "Coin insufficient, try insert more")).append("\n");
                     }
                 }
-                systemResponse += statusWithArgs(
+                systemResponse.append(statusWithArgs(
                         shelveBoxController.getTotalHoldAmount(),
                         availableGoodsLen,
                         shelveBoxController.getSelectedGoods()
-                );
+                ));
                 break;
             case "3":
                 calculatorService = new CoinCalculatorService(
@@ -126,35 +130,35 @@ public class App {
                         shelveBoxController.getTotalHoldAmount()
                 );
                 returnGate = calculatorService.getChange();
-                systemResponse += hinter.setOutput(2, "Your change is being prepared (if any), you may now empty the Outlet\n");
-                systemResponse += statusWithArgs(
+                systemResponse.append(hinter.setOutput(2, "Your change is being prepared (if any), you may now empty the Outlet")).append("\n");
+                systemResponse.append(statusWithArgs(
                         shelveBoxController.getTotalHoldAmount(),
                         availableGoodsLen,
                         shelveBoxController.getSelectedGoods()
-                );
+                ));
                 break;
             case "4":
                 calculatorService.getRemainingCoins().addAll(shelveBoxController.getInsertedCoin());
                 COIN_STOCK_CONTAINER = calculatorService.getRemainingCoins();
-                systemResponse += hinter.setOutput(2, "Please collect your change in Return Gate\n");
+                systemResponse.append(hinter.setOutput(2, "Please collect your change in Return Gate")).append("\n");
                 calculatorService = new CoinCalculatorService(calculatorService.getRemainingCoins());
-                systemResponse += statusWithArgs(
+                systemResponse.append(statusWithArgs(
                         0,
                         availableGoodsLen,
                         shelveBoxController.getSelectedGoods()
-                );
+                ));
                 reset();
                 break;
             case "5":
                 reset();
-                systemResponse += hinter.setOutput(2, "Thank you for using our service\n");
-                systemResponse += status();
+                systemResponse.append(hinter.setOutput(2, "Thank you for using our service")).append("\n");
+                systemResponse.append(status());
                 break;
             case "6": // easter egg
                 COIN_STOCK_CONTAINER.forEach(System.out::println);
         }
 
-        return systemResponse;
+        return systemResponse.toString();
     }
 
     private void reset() {
