@@ -15,7 +15,6 @@ public class AppTest {
     @Before
     public void setUp() throws Exception {
         app = new App();
-        shelveBoxController = new ShelveBoxController().init();
     }
 
     @After
@@ -24,9 +23,11 @@ public class AppTest {
 
     @Test
     public void main() {
-        shelveBoxController.insertCoin(500);
-        shelveBoxController.insertCoin(500);
-        shelveBoxController.insertCoin(500);
-        assertEquals(shelveBoxController.getTotalHoldAmount(), 1500);
+        app.processCommand("1 500");
+//        shelveBoxController.test();
+//        shelveBoxController.insertCoin(500);
+//        shelveBoxController.insertCoin(500);
+//        shelveBoxController.insertCoin(500);
+//        assertEquals(shelveBoxController.getTotalHoldAmount(), 1500);
     }
 }
