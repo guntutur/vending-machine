@@ -23,7 +23,7 @@ public class App {
         this.calculatorService = new CoinCalculatorService(COIN_STOCK_CONTAINER);
     }
 
-    public App(ShelveBoxController shelveBoxController, CoinCalculatorService coinCalculatorService) {
+    App(ShelveBoxController shelveBoxController, CoinCalculatorService coinCalculatorService) {
         this.shelveBoxController = shelveBoxController;
         this.calculatorService = coinCalculatorService;
     }
@@ -145,16 +145,22 @@ public class App {
                 ));
                 break;
             case "4":
-                calculatorService.getRemainingCoins().addAll(shelveBoxController.getInsertedCoin());
-                COIN_STOCK_CONTAINER = calculatorService.getRemainingCoins();
-                systemResponse.append(hinter.setOutput(2, "Please collect your change in Return Gate")).append("\n");
-                calculatorService = new CoinCalculatorService(calculatorService.getRemainingCoins());
-                systemResponse.append(statusWithArgs(
-                        0,
-                        availableGoodsLen,
-                        shelveBoxController.getSelectedGoods()
-                ));
-                reset();
+
+                if (shelveBoxController.getInsertedCoin().size() > 0) {
+                    calculatorService.getRemainingCoins().addAll(shelveBoxController.getInsertedCoin());
+                    COIN_STOCK_CONTAINER = calculatorService.getRemainingCoins();
+                    systemResponse.append(hinter.setOutput(2, "Please collect your change in Return Gate")).append("\n");
+                    calculatorService = new CoinCalculatorService(calculatorService.getRemainingCoins());
+
+                    systemResponse.append(statusWithArgs(
+                            0,
+                            availableGoodsLen,
+                            shelveBoxController.getSelectedGoods()
+                    ));
+                    reset();
+                } else {
+                    systemResponse.append(status());
+                }
                 break;
             case "5":
                 reset();
