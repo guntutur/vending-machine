@@ -12,14 +12,6 @@ import java.util.List;
  *
  * This Service Aims to calculate if a given list of coins can be processed to purchase goods and get the change
  * On success it divides up the coins into change and remainingCoins
- *
- * implement rule no 3 of vending.md
- * 3. Conditions to determine change possibility
- *         Change is impossible if the coins contained in the Vending Machine’s vault is in the below conditions:
- *         - 10 JPY coin: Less than 9 coins
- *         - 100 JPY coin: Less than 4 coins
- *         In case if vending machine running out of 10 JPY coin, then 50 JPY, 100 JPY, 500 JPY coins cannot be used.
- *         In case if vending machine running out of 100 JPY coin, then 500 JPY coins cannot be used.
  */
 public class CoinCalculatorService {
 
