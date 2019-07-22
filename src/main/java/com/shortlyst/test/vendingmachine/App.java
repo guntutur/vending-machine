@@ -126,7 +126,7 @@ public class App {
                         shelveBoxController.getTotalHoldAmount()
                 );
                 returnGate = calculatorService.getChange();
-                systemResponse += hinter.setOutput(2, "Your change is being prepared, you may now empty the Outlet\n");
+                systemResponse += hinter.setOutput(2, "Your change is being prepared (if any), you may now empty the Outlet\n");
                 systemResponse += statusWithArgs(
                         shelveBoxController.getTotalHoldAmount(),
                         availableGoodsLen,

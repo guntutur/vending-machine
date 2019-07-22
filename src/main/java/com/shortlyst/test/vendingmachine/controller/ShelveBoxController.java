@@ -66,7 +66,9 @@ public class ShelveBoxController implements IInput {
     }
 
     public boolean canProceed() {
-        return sumInsertedCoin() > getTotalCurrentHoldAmount();
+        System.out.println(sumInsertedCoin());
+        System.out.println(getTotalCurrentHoldAmount());
+        return sumInsertedCoin() >= getTotalCurrentHoldAmount();
     }
 
     public void removeFromContainer() {
