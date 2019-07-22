@@ -57,6 +57,7 @@ public class ShelveBoxTest {
 
     @Test
     public void assertGoodsReleased() {
+
         shelveBox.addToShelf("Energy Drink", 120, 2);
         shelveBox.releaseGoodsFromIndex(0);
 
@@ -64,5 +65,16 @@ public class ShelveBoxTest {
 
         Assert.assertEquals(1, currentStock);
 
+        shelveBox.releaseGoodsFromIndex(0);
+
+        int supposedNoStock = shelveBox.getShelveBoxFromIndex(0).getQuantity();
+
+        Assert.assertEquals(0, supposedNoStock);
+    }
+
+    @Test
+    public void assertNullIfGoodsOutOfStock() {
+        shelveBox.addToShelf("Energy Drink", 120, 0);
+        Assert.assertNull(shelveBox.releaseGoodsFromIndex(0));
     }
 }
