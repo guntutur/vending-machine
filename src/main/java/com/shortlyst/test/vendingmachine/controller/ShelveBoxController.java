@@ -89,6 +89,10 @@ public class ShelveBoxController implements IInput {
         this.insertedCoin = insertedCoin;
     }
 
+    public void releaseIfProceed(int index) {
+        shelveBoxService.releaseGoodsFromIndex(index);
+    }
+
     @Override
     public void reset() {
         totalCurrentHoldAmount = 0;
@@ -98,7 +102,8 @@ public class ShelveBoxController implements IInput {
 
     @Override
     public void selectShelf(int index) {
-        selectedGoods.add(shelveBoxService.releaseGoodsFromIndex(index));
+//        selectedGoods.add(shelveBoxService.releaseGoodsFromIndex(index));
+        selectedGoods.add(getGoodsFromIndex(index));
         selectedGoods.forEach(goods -> totalCurrentHoldAmount += goods.getPrice());
     }
 

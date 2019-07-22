@@ -23,7 +23,7 @@ public class App {
         this.calculatorService = new CoinCalculatorService(COIN_STOCK_CONTAINER);
     }
 
-    App(ShelveBoxController shelveBoxController, CoinCalculatorService coinCalculatorService) {
+    public App(ShelveBoxController shelveBoxController, CoinCalculatorService coinCalculatorService) {
         this.shelveBoxController = shelveBoxController;
         this.calculatorService = coinCalculatorService;
     }
@@ -47,6 +47,7 @@ public class App {
 
     private void interactiveShell() {
 
+        hinter.clear();
         System.out.println("Welcome to Vending Machine ver 1.0-SNAPSHOT");
         System.out.println("Type help to see available command");
         System.out.println("Type exit to terminate the program");
@@ -58,26 +59,30 @@ public class App {
 
         while (true) {
 
-            System.out.print("> ");
+            System.out.print("[input]> ");
             theAbsoluteRealInput = scanner.nextLine();
 
             switch (theAbsoluteRealInput) {
                 case "help" :
+                    hinter.clear();
                     hinter.help();
                     break;
                 case "exit" :
-                case "quit" :
                     System.exit(1);
+                    break;
+                case "" :
+                    // do nothing on enter key
                     break;
                 default:
                     if (hinter.validateCommand(theAbsoluteRealInput)) {
+                        hinter.clear();
                         System.out.println(processCommand(theAbsoluteRealInput));
                     }
             }
         }
     }
 
-    String processCommand(String input) {
+    public String processCommand(String input) {
 
         StringBuilder systemResponse = new StringBuilder();
 
@@ -116,6 +121,8 @@ public class App {
                     if (!shelveBoxController.canProceed()) {
                         shelveBoxController.removeFromContainer();
                         systemResponse.append(hinter.setOutput(1, "Coin insufficient, try insert more")).append("\n");
+                    } else {
+                        shelveBoxController.releaseIfProceed(selectedIndex);
                     }
                 }
                 systemResponse.append(statusWithArgs(
@@ -344,6 +351,10 @@ public class App {
             }
 
             return valid;
+        }
+
+        void clear() {
+            System.out.print("\033\143");
         }
     }
 }
